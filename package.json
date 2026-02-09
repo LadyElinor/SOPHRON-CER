@@ -1,0 +1,43 @@
+{
+  "name": "cer-telemetry-improved",
+  "version": "2.0.0",
+  "description": "Enhanced CER-Telemetry pipeline with modular architecture and advanced analysis",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test test/**/*.test.js",
+    "test:watch": "node --test --watch test/**/*.test.js",
+    "lint": "eslint .",
+    "analyze": "node src/cli.js analyze",
+    "validate": "node src/cli.js validate",
+    "report": "node src/cli.js report"
+  },
+  "keywords": [
+    "telemetry",
+    "observability",
+    "safety",
+    "content-analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^3.22.4",
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1",
+    "csv-writer": "^1.6.0",
+    "csv-parse": "^5.5.2",
+    "simple-statistics": "^7.8.3",
+    "d3": "^7.8.5",
+    "apache-arrow": "^14.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.54.0",
+    "jsdoc": "^4.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

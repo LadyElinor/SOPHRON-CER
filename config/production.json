@@ -1,0 +1,63 @@
+{
+  "$schema": "./schema.js",
+  "description": "Production configuration for CER-Telemetry",
+
+  "api": {
+    "baseUrl": "${MOLTX_API_URL}",
+    "timeout": 60000,
+    "retryAttempts": 5,
+    "retryBackoff": 2000,
+    "rateLimit": {
+      "maxRequests": 50,
+      "windowMs": 60000
+    }
+  },
+
+  "sampling": {
+    "minSampleSize": 200,
+    "maxSampleSize": 20000,
+    "stratified": true,
+    "temporal": {
+      "enabled": true,
+      "batchSizeMinutes": 30
+    }
+  },
+
+  "analysis": {
+    "confidenceLevel": 0.95,
+    "minBlockSize": 50,
+    "impressionBands": {
+      "low": 100,
+      "mid": 1000,
+      "high": 10000
+    },
+    "computeEffectSizes": true,
+    "enableTrendDetection": true
+  },
+
+  "output": {
+    "baseDir": "./outputs/moltx_runs",
+    "formats": ["json", "csv", "html"],
+    "includeProvenance": true,
+    "generateReport": true
+  },
+
+  "privacy": {
+    "enablePiiDetection": true,
+    "enableDifferentialPrivacy": false,
+    "epsilonPrivacy": 1.0,
+    "kAnonymity": 10
+  },
+
+  "logging": {
+    "level": "info",
+    "pretty": false,
+    "file": "/var/log/cer-telemetry/app.log"
+  },
+
+  "validation": {
+    "enforceInvariants": true,
+    "failOnViolation": true,
+    "generateValidationReport": true
+  }
+}
