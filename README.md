@@ -2,6 +2,8 @@
 
 Enhanced CER-Telemetry pipeline with modular architecture, advanced statistical analysis, and comprehensive invariant validation.
 
+Research & Literature: see [docs/ARXIV_RESEARCH_GUIDE.md](./docs/ARXIV_RESEARCH_GUIDE.md).
+
 ## What's New in v2.0
 
 ### Architecture Improvements
