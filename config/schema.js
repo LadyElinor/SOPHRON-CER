@@ -37,7 +37,20 @@ export const ConfigSchema = z.object({
       high: z.number().int().min(0)
     }).default({ low: 100, mid: 1000, high: 10000 }),
     computeEffectSizes: z.boolean().default(true),
-    enableTrendDetection: z.boolean().default(true)
+    enableTrendDetection: z.boolean().default(true),
+
+    // Multiple-testing control (Benjamini–Hochberg FDR target)
+    fdrQ: z.number().min(0).max(1).default(0.05),
+
+    // Experimental: activation-delta drift (proxy/open-model mode)
+    // This does not run against MoltX production models unless activations are available.
+    activationDrift: z.object({
+      enabled: z.boolean().default(false),
+      threshold: z.number().min(0).max(1).default(0.5),
+      // provenance fields (record what proxy produced activations)
+      proxyModelId: z.string().default(''),
+      layer: z.string().default('')
+    }).default({ enabled: false, threshold: 0.5, proxyModelId: '', layer: '' })
   }),
 
   // Output Configuration
@@ -100,7 +113,14 @@ export const defaultConfig = {
       high: 10000
     },
     computeEffectSizes: true,
-    enableTrendDetection: true
+    enableTrendDetection: true,
+    fdrQ: 0.05,
+    activationDrift: {
+      enabled: false,
+      threshold: 0.5,
+      proxyModelId: '',
+      layer: ''
+    }
   },
   output: {
     baseDir: './outputs/moltx_runs',

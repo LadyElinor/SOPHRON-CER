@@ -62,3 +62,10 @@ build/
 notes.md
 TODO.md
 SCRATCH.md
+
+# Local tools / large external binaries
+azcopy.exe
+
+# TaskTracker / activation proxy artifacts (local)
+tasktracker_activations/
+tasktracker_*.jsonl

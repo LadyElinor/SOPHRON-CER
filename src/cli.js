@@ -279,6 +279,67 @@ program
   .action(compareRuns);
 
 program
+  .command('activation-drift-proxy')
+  .description('Run activation-delta drift prototype in proxy mode (synthetic or JSONL pairs)')
+  .option('--jsonl <path>', 'Path to JSONL with {before, after, y} rows')
+  .option('--dim <number>', 'Synthetic dimension', '32')
+  .option('--n <number>', 'Synthetic pairs per class', '500')
+  .option('--sep <number>', 'Synthetic separation', '2.0')
+  .option('--noise <number>', 'Synthetic noise', '0.25')
+  .option('--steps <number>', 'Training steps (batch GD)', '200')
+  .option('--lr <number>', 'Learning rate', '0.2')
+  .option('--l2 <number>', 'L2 regularization', '0')
+  .option('--threshold <number>', 'Decision threshold', '0.5')
+  .option('-o, --output <file>', 'Write JSON results to file')
+  .option('--log-level <level>', 'Log level', 'info')
+  .option('--json', 'Output logs as JSON', false)
+  .action(async (options) => {
+    const config = loadConfig({
+      logging: {
+        level: options.logLevel || 'info',
+        pretty: !options.json
+      },
+      analysis: {
+        activationDrift: {
+          enabled: true,
+          threshold: Number(options.threshold)
+        }
+      }
+    });
+
+    const logger = createLogger(config.logging);
+
+    const {
+      loadJsonlPairs,
+      makeSyntheticPairs,
+      trainAndEval
+    } = await import('../lib/experiments/activation-drift-proxy.js');
+
+    const threshold = Number(options.threshold);
+    const steps = Number(options.steps);
+    const lr = Number(options.lr);
+    const l2 = Number(options.l2);
+
+    const pairs = options.jsonl
+      ? await loadJsonlPairs(options.jsonl)
+      : makeSyntheticPairs({
+          n: Number(options.n),
+          dim: Number(options.dim),
+          sep: Number(options.sep),
+          noise: Number(options.noise)
+        });
+
+    const results = trainAndEval({ pairs, steps, lr, l2, threshold, config, logger });
+
+    if (options.output) {
+      await fs.writeFile(options.output, JSON.stringify(results, null, 2), 'utf-8');
+      logger.info({ output: options.output }, 'Wrote activation drift proxy results');
+    } else {
+      console.log(JSON.stringify(results, null, 2));
+    }
+  });
+
+program
   .command('list')
   .description('List all available runs')
   .action(async () => {

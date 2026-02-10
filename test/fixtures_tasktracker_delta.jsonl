@@ -1,0 +1,4 @@
+{"delta":[0.0,0.1,0.0,0.0],"y":0,"meta":{"src":"clean_0.pt","split":"test","layer":"-1","model":"mistral-7b"}}
+{"delta":[2.1,1.9,2.0,2.2],"y":1,"meta":{"src":"poisoned_0.pt","split":"test","layer":"-1","model":"mistral-7b"}}
+{"delta":[0.1,0.0,0.0,0.2],"label":0,"meta":{"src":"clean_1.pt","split":"test","layer":"-1","model":"mistral-7b"}}
+{"delta":[1.8,2.2,2.0,2.1],"label":1,"meta":{"src":"poisoned_1.pt","split":"test","layer":"-1","model":"mistral-7b"}}

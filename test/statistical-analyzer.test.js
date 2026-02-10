@@ -92,6 +92,20 @@ describe('StatisticalAnalyzer', () => {
 
       assert.strictEqual(result.significant, false);
     });
+
+    it('should return numeric pValue for df=1', () => {
+      const analyzer = new StatisticalAnalyzer(mockConfig, mockLogger);
+      const observed = [
+        [60, 40],
+        [30, 70]
+      ];
+      const result = analyzer.chiSquareTest(observed);
+
+      assert.strictEqual(result.df, 1);
+      assert(typeof result.pValueNumeric === 'number');
+      assert(result.pValueNumeric >= 0 && result.pValueNumeric <= 1);
+      assert(result.pValueNumeric < 0.05);
+    });
   });
 
   describe('weightedPrevalence', () => {
@@ -190,6 +204,33 @@ describe('StatisticalAnalyzer', () => {
       assert.strictEqual(result.riskUnexposed, 0.3);
       assert(result.confidence.lower > 0);
       assert(result.confidence.upper > result.relativeRisk);
+    });
+  });
+
+  describe('benjaminiHochberg', () => {
+    it('should compute q-values and rejection set', () => {
+      const analyzer = new StatisticalAnalyzer(mockConfig, mockLogger);
+      const p = [0.001, 0.02, 0.04, 0.2, null];
+      const { qValues, rejected, k } = analyzer.benjaminiHochberg(p, 0.05);
+
+      assert.strictEqual(qValues.length, p.length);
+      assert.strictEqual(rejected.length, p.length);
+
+      // null should stay null
+      assert.strictEqual(qValues[4], null);
+      assert.strictEqual(rejected[4], false);
+
+      // The smallest p-values should be rejected
+      assert.strictEqual(rejected[0], true);
+      assert.strictEqual(rejected[1], true);
+
+      // Large p should not be rejected
+      assert.strictEqual(rejected[3], false);
+      assert(k >= 2);
+
+      // q-values should be monotone after sorting; spot-check basic bounds
+      assert(qValues[0] <= 0.01);
+      assert(qValues[3] >= 0.2);
     });
   });
 });
