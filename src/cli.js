@@ -8,8 +8,10 @@ import { MoltxCollector } from '../lib/collectors/moltx-collector.js';
 import { PrevalenceAnalyzer } from '../lib/analyzers/prevalence-analyzer.js';
 import { InvariantValidator } from '../lib/validators/invariant-validator.js';
 import { OutputReporter } from '../lib/reporters/output-reporter.js';
+import { SafetyReportReporter } from '../lib/reporters/safety-report-reporter.js';
 import { PiiDetector } from '../lib/utils/pii-detector.js';
 import fs from 'fs/promises';
+import crypto from 'crypto';
 import path from 'path';
 
 dotenv.config();
@@ -57,9 +59,17 @@ async function runAnalysis(options) {
 
     logger.info({ postCount: posts.length }, 'Fetched posts');
 
-    // Check for PII
+    // Check for PII (also capture a compact summary for safety_report)
     const piiDetector = new PiiDetector(config, logger);
-    piiDetector.scanAndLog(posts, 'raw_posts');
+    const piiFindings = piiDetector.scanObject(posts);
+    if (piiFindings.length > 0) {
+      const report = piiDetector.generateReport(piiFindings);
+      logger.warn({ label: 'raw_posts', report }, 'PII detected in data');
+    }
+    const piiSummary = (() => {
+      const rep = piiDetector.generateReport(piiFindings);
+      return { findings: rep.totalFindings, instances: rep.totalInstances };
+    })();
 
     // Analyze
     const analyzer = new PrevalenceAnalyzer(config, logger);
@@ -67,13 +77,27 @@ async function runAnalysis(options) {
 
     // Validate
     const validator = new InvariantValidator(config, logger);
+    const gitSha = await getGitCommit();
+
+    const packageVersion = await getPackageVersion();
+    const dependencyLockHash = await getDependencyLockHash();
+
+    // Data identity: hash of sorted post IDs (+ timestamps when present)
+    const dataHash = new SafetyReportReporter(config, logger).computeDataHash(posts);
+
     const metadata = {
       runId,
       timestamp: new Date().toISOString(),
       config,
       configHash: reporter.hashConfig(config),
-      codeVersion: await getGitCommit(),
-      nodeVersion: process.version
+      gitSha,
+      codeVersion: gitSha,
+      nodeVersion: process.version,
+      packageVersion,
+      dependencyLockHash,
+      dataHash,
+      source: options.dryRun ? 'mock' : 'moltx',
+      piiSummary
     };
     const validationResults = validator.validate(analysisResults, metadata);
 
@@ -122,6 +146,26 @@ async function runAnalysis(options) {
 /**
  * Validate existing run outputs
  */
+async function getPackageVersion() {
+  try {
+    const pkgPath = new URL('../package.json', import.meta.url);
+    const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf-8'));
+    return pkg.version || 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
+async function getDependencyLockHash() {
+  try {
+    const lockPath = new URL('../package-lock.json', import.meta.url);
+    const lockText = await fs.readFile(lockPath, 'utf-8');
+    return crypto.createHash('sha256').update(lockText).digest('hex');
+  } catch {
+    return null;
+  }
+}
+
 async function validateRun(runId, options) {
   const config = loadConfig({
     logging: {

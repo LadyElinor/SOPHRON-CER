@@ -61,6 +61,17 @@ export const ConfigSchema = z.object({
     generateReport: z.boolean().default(true)
   }),
 
+  // Reporting Configuration
+  reporting: z.object({
+    safetyReport: z.object({
+      enabled: z.boolean().default(true),
+      formats: z.array(z.enum(['json', 'md'])).default(['json']),
+      maxPrimarySignals: z.number().int().positive().max(50).default(10),
+      wideCiThreshold: z.number().min(0).max(1).default(0.20),
+      failOnMissingManifest: z.boolean().default(true)
+    }).default({ enabled: true, formats: ['json'], maxPrimarySignals: 10, wideCiThreshold: 0.20, failOnMissingManifest: true })
+  }).default({ safetyReport: { enabled: true, formats: ['json'], maxPrimarySignals: 10, wideCiThreshold: 0.20, failOnMissingManifest: true } }),
+
   // Privacy Configuration
   privacy: z.object({
     enablePiiDetection: z.boolean().default(true),
@@ -127,6 +138,15 @@ export const defaultConfig = {
     formats: ['json', 'csv'],
     includeProvenance: true,
     generateReport: true
+  },
+  reporting: {
+    safetyReport: {
+      enabled: true,
+      formats: ['json'],
+      maxPrimarySignals: 10,
+      wideCiThreshold: 0.20,
+      failOnMissingManifest: true
+    }
   },
   privacy: {
     enablePiiDetection: true,

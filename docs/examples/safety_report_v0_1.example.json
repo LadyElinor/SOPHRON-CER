@@ -1,0 +1,59 @@
+{
+  "report_id": "00000000-0000-0000-0000-000000000000",
+  "spec_version": "0.1",
+  "generated_at": "2026-02-11T14:22:03Z",
+  "manifest": {
+    "run_id": "run_2026-02-11T14-15-37-131Z_228c7761",
+    "git_sha": "432517e",
+    "package_version": "0.0.0",
+    "config_hash": "sha256:0123456789abcdef",
+    "dependency_lock_hash": "sha256:0123456789abcdef",
+    "data_hash": "sha256:0123456789abcdef"
+  },
+  "data_summary": {
+    "sample_size": 1000,
+    "effective_n": null,
+    "time_window": { "start": null, "end": null },
+    "sources": ["moltx"]
+  },
+  "invariants": {
+    "all_passed": true,
+    "violations": []
+  },
+  "primary_signal_selection": {
+    "max_primary": 10,
+    "method": "risk_weighted_topk",
+    "deterministic": true,
+    "inputs": ["prevalence", "ci_width"],
+    "seed": null,
+    "notes": "Deterministic given the same inputs"
+  },
+  "findings": {
+    "primary_signals": [
+      {
+        "signal_id": "overall.prevalence.hasOutboundPressure",
+        "description": "Overall prevalence of outbound-pressure language",
+        "estimate": 0.12,
+        "ci": { "lower": 0.10, "upper": 0.14, "method": "wilson" },
+        "effect_size": { "cohen_h": null, "interpretation": null },
+        "tests": { "p_value": null, "p_adjusted": null, "adjustment": "none", "m": null },
+        "stats_quality": {
+          "power_estimate": null,
+          "power_assumptions": null,
+          "multiplicity": { "family": "primary_signals", "m": null, "adjustment": "none", "p_adjusted": null },
+          "flags": ["power_unknown", "multiplicity_unknown"]
+        }
+      }
+    ],
+    "secondary_signals": []
+  },
+  "privacy": {
+    "pii_redactions": 0,
+    "k_anonymity_threshold": 5
+  },
+  "assessment": {
+    "overall": { "category": "unknown", "score": null, "components": [] },
+    "guidance": "No automated assessment in example. See findings + humility flags.",
+    "alerts_triggered": []
+  }
+}
