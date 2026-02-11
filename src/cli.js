@@ -2,7 +2,7 @@
 
 import { Command } from 'commander';
 import dotenv from 'dotenv';
-import { loadConfig } from '../config/schema.js';
+import { loadConfig, defaultConfig } from '../config/schema.js';
 import { createLogger } from '../lib/utils/logger.js';
 import { MoltxCollector } from '../lib/collectors/moltx-collector.js';
 import { PrevalenceAnalyzer } from '../lib/analyzers/prevalence-analyzer.js';
@@ -27,7 +27,8 @@ async function runAnalysis(options) {
       pretty: !options.json
     },
     sampling: {
-      maxSampleSize: options.maxSamples || 10000
+      ...defaultConfig.sampling,
+      maxSampleSize: Number(options.maxSamples ?? defaultConfig.sampling.maxSampleSize)
     },
     output: {
       formats: options.formats ? options.formats.split(',') : ['json', 'csv', 'html']
@@ -36,6 +37,12 @@ async function runAnalysis(options) {
 
   const logger = createLogger(config.logging);
   logger.info({ config: config }, 'Starting CER-Telemetry analysis');
+
+  // Create reporter early so we can generate deterministic run metadata
+  const reporter = new OutputReporter(config, logger);
+  const runId = (options.runId && String(options.runId).trim().length > 0)
+    ? String(options.runId).trim()
+    : reporter.generateRunId();
 
   try {
     // Initialize collector
@@ -61,7 +68,10 @@ async function runAnalysis(options) {
     // Validate
     const validator = new InvariantValidator(config, logger);
     const metadata = {
-      runId: options.runId,
+      runId,
+      timestamp: new Date().toISOString(),
+      config,
+      configHash: reporter.hashConfig(config),
       codeVersion: await getGitCommit(),
       nodeVersion: process.version
     };
@@ -77,7 +87,6 @@ async function runAnalysis(options) {
     }
 
     // Write outputs
-    const reporter = new OutputReporter(config, logger);
     const outputs = await reporter.writeOutputs(
       analysisResults,
       validationResults,
