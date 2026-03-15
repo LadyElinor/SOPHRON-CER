@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SOPHRON probe_budget_runs JSONL record",
+  "type": "object",
+  "required": [
+    "timestamp_utc",
+    "source_type",
+    "run_id",
+    "test_id",
+    "p95_detection_latency_ms",
+    "false_negative_rate",
+    "false_positive_rate",
+    "throughput_penalty_percent",
+    "safe_state_transition_correct_rate"
+  ],
+  "properties": {
+    "timestamp_utc": {"type": "string", "format": "date-time"},
+    "source_type": {"type": "string", "enum": ["hardware", "sim"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "test_id": {"type": "string", "pattern": "^PB(-C)?-\\d{3}$"},
+    "campaign_id": {"type": "string"},
+    "p95_detection_latency_ms": {"type": "number", "minimum": 0},
+    "false_negative_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "false_positive_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "throughput_penalty_percent": {"type": "number", "minimum": 0, "maximum": 100},
+    "safe_state_transition_correct_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "log_evidence": {"type": "string"}
+  },
+  "additionalProperties": true
+}

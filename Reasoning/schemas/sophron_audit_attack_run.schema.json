@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SOPHRON audit_attack_runs JSONL record",
+  "type": "object",
+  "required": [
+    "timestamp_utc",
+    "source_type",
+    "run_id",
+    "attack_id",
+    "expected_result",
+    "observed_result",
+    "detector_evidence",
+    "packet_loss_pct",
+    "jitter_ms",
+    "skew_ms"
+  ],
+  "properties": {
+    "timestamp_utc": { "type": "string", "format": "date-time" },
+    "source_type": { "type": "string", "enum": ["hardware", "sim"] },
+    "run_id": { "type": "string", "minLength": 1 },
+    "attack_id": { "type": "string", "pattern": "^AUD-\\d{3}$" },
+    "expected_result": { "type": "string", "enum": ["reject", "accept"] },
+    "observed_result": { "type": "string", "enum": ["reject", "accept"] },
+    "detector_evidence": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        }
+      ]
+    },
+    "log_evidence": { "type": "string" },
+    "packet_loss_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+    "jitter_ms": { "type": "number", "minimum": 0 },
+    "skew_ms": { "type": "number", "minimum": 0 },
+    "noise_model": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}

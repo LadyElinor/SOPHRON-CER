@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sophron_safety_frame_v0_3.schema.json",
+  "title": "SOPHRON-1 Safety Frame v0.3",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "timestamp_utc",
+    "epoch_id",
+    "align_status",
+    "probe_mode",
+    "baseline_budget_pct",
+    "burst_budget_pct",
+    "safety_budget_total_pct",
+    "execution_budget_pct",
+    "trigger_class",
+    "cooldown_remaining",
+    "escalation_level",
+    "heartbeat_age_ms",
+    "audit_prev_anchor",
+    "audit_anchor",
+    "audit_footer"
+  ],
+  "properties": {
+    "protocol_version": {
+      "type": "string",
+      "pattern": "^v0\\.3(-[A-Za-z0-9._-]+)?$"
+    },
+    "timestamp_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "epoch_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "align_status": {
+      "type": "string",
+      "pattern": "^(GREEN|YELLOW|RED)\\|(GREEN|YELLOW|RED)\\|(GREEN|YELLOW|RED)$"
+    },
+    "probe_mode": {
+      "type": "string",
+      "enum": ["NULL", "ACTIVE", "BURST"]
+    },
+    "baseline_budget_pct": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "burst_budget_pct": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "safety_budget_total_pct": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "execution_budget_pct": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "execution_floor_pct": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 85
+    },
+    "trigger_class": {
+      "type": "string",
+      "enum": ["none", "replay", "truncation", "fork", "skew", "jitter", "semantic"]
+    },
+    "cooldown_remaining": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "escalation_level": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3
+    },
+    "heartbeat_age_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "audit_prev_anchor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audit_anchor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audit_footer": {
+      "type": "object",
+      "required": ["checksum", "alg"],
+      "properties": {
+        "checksum": {
+          "type": "string",
+          "minLength": 4
+        },
+        "alg": {
+          "type": "string",
+          "enum": ["sha256-trunc", "xor", "blake3-trunc"]
+        },
+        "nonce": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "detector_reason_codes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "allOf": [
+    {
+      "description": "Safety and execution budgets should sum to ~100 (tolerance 0.5).",
+      "if": {
+        "required": ["safety_budget_total_pct", "execution_budget_pct"]
+      },
+      "then": {
+        "properties": {
+          "_budget_sum_hint": {
+            "const": "enforced-by-runtime-validator"
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "probe_mode": { "const": "BURST" } }, "required": ["probe_mode"] },
+      "then": {
+        "properties": { "burst_budget_pct": { "exclusiveMinimum": 0 } }
+      }
+    },
+    {
+      "if": { "properties": { "escalation_level": { "const": 3 } }, "required": ["escalation_level"] },
+      "then": {
+        "required": ["detector_reason_codes"]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

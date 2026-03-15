@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SOPHRON skew_runs JSONL record",
+  "type": "object",
+  "required": [
+    "timestamp_utc",
+    "source_type",
+    "run_id",
+    "test_id",
+    "skew_ms",
+    "jitter_ms",
+    "packet_loss_pct",
+    "observed_false_negative_rate",
+    "observed_false_positive_rate",
+    "observed_p95_detection_latency_ms",
+    "observed_safe_state_correct_rate"
+  ],
+  "properties": {
+    "timestamp_utc": {"type": "string", "format": "date-time"},
+    "source_type": {"type": "string", "enum": ["hardware", "sim"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "test_id": {"type": "string", "pattern": "^SK-\\d{3}$"},
+    "campaign_id": {"type": "string"},
+    "skew_ms": {"type": "number", "minimum": 0},
+    "jitter_ms": {"type": "number", "minimum": 0},
+    "packet_loss_pct": {"type": "number", "minimum": 0, "maximum": 100},
+    "observed_false_negative_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "observed_false_positive_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "observed_p95_detection_latency_ms": {"type": "number", "minimum": 0},
+    "observed_safe_state_correct_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "detector_evidence": {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
+    "log_evidence": {"type": "string"}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,18 @@
+{
+  "baseline_id": "SOPH-BL-2026-03-15",
+  "locked_at": "2026-03-15",
+  "master_seed": 20260315,
+  "artifacts": {
+    "probe_mode_comparison": "Reasoning/baselines/SOPH-BL-2026-03-15/sophron_probe_mode_comparison.csv",
+    "target10_check": "Reasoning/baselines/SOPH-BL-2026-03-15/sophron_probe_target10_check.csv"
+  },
+  "chunked10": {
+    "mean_p95_ms": 169.721,
+    "min_margins": {
+      "latency_margin_ms": 18.481533,
+      "fpr_margin": 0.0009424,
+      "throughput_margin_percent": 0.2255,
+      "sctr_margin": 0.00373407
+    }
+  }
+}

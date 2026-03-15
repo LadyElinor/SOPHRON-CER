@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import csv
+from collections import defaultdict
+from pathlib import Path
+
+RESULTS = Path("Reasoning/sophron_probe_budget_results.csv")
+SUMMARY = Path("Reasoning/sophron_probe_budget_summary.md")
+
+
+def _f(v: str) -> float:
+    return float((v or "0").strip())
+
+
+def _b(v: str) -> bool:
+    return str(v).strip().lower() in {"true", "1", "yes"}
+
+
+def _mean(xs: list[float]) -> float:
+    return sum(xs) / len(xs) if xs else 0.0
+
+
+def main() -> None:
+    if not RESULTS.exists():
+        raise FileNotFoundError(RESULTS)
+
+    with RESULTS.open("r", encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+
+    by_budget: dict[int, list[dict[str, str]]] = defaultdict(list)
+    by_mode_budget: dict[tuple[str, int], list[dict[str, str]]] = defaultdict(list)
+    for r in rows:
+        b = int(round(_f(r.get("budget_percent", "0"))))
+        mode = (r.get("audit_mode") or "monolithic").strip()
+        by_budget[b].append(r)
+        by_mode_budget[(mode, b)].append(r)
+
+    budget_stats = []
+    for b in sorted(by_budget.keys()):
+        rs = by_budget[b]
+        total = len(rs)
+        passed = sum(1 for r in rs if _b(r.get("pass", "False")))
+        mean_p95 = _mean([_f(r.get("p95_detection_latency_ms", "0")) for r in rs])
+        mean_fpr = _mean([_f(r.get("false_positive_rate", "0")) for r in rs])
+        mean_tpen = _mean([_f(r.get("throughput_penalty_percent", "0")) for r in rs])
+        status = "PASS" if passed == total and total > 0 else "FAIL"
+        budget_stats.append(
+            {
+                "budget": b,
+                "passed": passed,
+                "total": total,
+                "mean_p95": mean_p95,
+                "mean_fpr": mean_fpr,
+                "mean_tpen": mean_tpen,
+                "status": status,
+            }
+        )
+
+    passing_budgets = [s["budget"] for s in budget_stats if s["status"] == "PASS"]
+    recommended = min(passing_budgets) if passing_budgets else None
+
+    mode_reco = {}
+    for mode in sorted(set(k[0] for k in by_mode_budget.keys())):
+        mode_stats = []
+        for b in sorted(set(k[1] for k in by_mode_budget.keys() if k[0] == mode)):
+            rs = by_mode_budget[(mode, b)]
+            total = len(rs)
+            passed = sum(1 for r in rs if _b(r.get("pass", "False")))
+            mode_stats.append((b, total, passed))
+        passing = [b for (b, total, passed) in mode_stats if total > 0 and passed == total]
+        mode_reco[mode] = min(passing) if passing else None
+
+    lines = [
+        "# SOPHRON-1 Probe Budget Sweep Summary",
+        "",
+        "## Objective",
+        "Determine the minimum probe budget (5/10/15%) that satisfies safety detection thresholds with acceptable execution overhead.",
+        "",
+        "## Inputs",
+        "- Test matrix: `Reasoning/sophron_probe_budget_test_matrix.csv`",
+        "- Results: `Reasoning/sophron_probe_budget_results.csv`",
+        "",
+        "## Decision Rule",
+        "Select the **lowest budget** that passes all critical thresholds:",
+        "- false_negative_rate == 0.0",
+        "- p95_detection_latency_ms <= 200",
+        "- false_positive_rate <= 0.005",
+        "- throughput_penalty_percent <= budget_percent",
+        "- safe_state_transition_correct_rate >= 0.99",
+        "",
+        "## Results Snapshot",
+        "| Budget | Cells Passed / Total | Mean P95 Latency (ms) | Mean FP Rate | Mean Throughput Penalty (%) | Status |",
+        "|---|---:|---:|---:|---:|---|",
+    ]
+
+    for s in budget_stats:
+        lines.append(
+            f"| {s['budget']}% | {s['passed']} / {s['total']} | {s['mean_p95']:.3f} | {s['mean_fpr']:.6f} | {s['mean_tpen']:.3f} | {s['status']} |"
+        )
+
+    c10_rows = [r for r in rows if int(round(_f(r.get("budget_percent", "0")))) == 10 and (r.get("audit_mode") or "") == "chunked"]
+    c10_robust_ok = c10_rows and all(
+        _f(r.get("latency_margin_ms", "0")) >= 8.0
+        and _f(r.get("throughput_margin_percent", "0")) >= 0.25
+        and _f(r.get("p95_detection_latency_ms_cv", "1")) <= 0.08
+        and _f(r.get("safe_state_transition_correct_rate_p05", "0")) >= 0.992
+        for r in c10_rows
+    )
+
+    lines.extend([
+        "",
+        "## Recommended Budget",
+        f"- overall mixed-mode recommendation: `{str(recommended) + '%' if recommended is not None else 'No passing budget in current run'}`",
+        f"- monolithic recommendation: `{str(mode_reco.get('monolithic')) + '%' if mode_reco.get('monolithic') is not None else 'none'}`",
+        f"- chunked recommendation: `{str(mode_reco.get('chunked')) + '%' if mode_reco.get('chunked') is not None else 'none'}`",
+        "",
+        "## Robustness View (chunked@10)",
+        f"- rows evaluated: {len(c10_rows)}",
+        f"- robustness gate (margin + stability + tail proxy): {'PASS' if c10_robust_ok else 'FAIL'}",
+        "",
+        "## Notes",
+        "- Summary generated by `Reasoning/summarize_sophron_probe_budget.py`.",
+        "- Current harness output is synthetic-local evidence; replace with hardware/simulation-backed logs for final decision sign-off.",
+        "",
+    ])
+
+    SUMMARY.write_text("\n".join(lines), encoding="utf-8")
+    print(f"Wrote {SUMMARY}")
+    if recommended is not None:
+        print(f"RECOMMENDED={recommended}%")
+    else:
+        print("RECOMMENDED=NONE")
+
+
+if __name__ == "__main__":
+    main()
