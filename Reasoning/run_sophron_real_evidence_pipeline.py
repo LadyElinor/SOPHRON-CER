@@ -118,6 +118,7 @@ def main() -> None:
         ["python", "Reasoning/check_sophron_probe_budget_results.py"],
         ["python", "Reasoning/check_sophron_probe_target10.py"],
         ["python", "Reasoning/check_sophron_probe_budget_bridge.py"],
+        ["python", "Reasoning/check_sophron_adversarial_policy_resilience.py"],
         ["python", "Reasoning/check_sophron_cross_plane_skew.py"],
         ["python", "Reasoning/check_sophron_audit_attack_results.py"],
         ["python", "Reasoning/summarize_sophron_probe_budget.py"],
@@ -138,6 +139,7 @@ def main() -> None:
     unc001_target10 = read_check_status(ROOT / "sophron_probe_target10_check.csv")
     regression = read_check_status(ROOT / "sophron_regression_delta_check.csv")
     elastic_bridge = read_bridge_elastic_status(ROOT / "sophron_probe_budget_bridge_check.csv")
+    adv_policy = read_check_status(ROOT / "sophron_adversarial_resilience_check.csv")
     unc002 = read_check_status(ROOT / "sophron_cross_plane_skew_check.csv")
     unc003 = read_check_status(ROOT / "sophron_audit_attack_results_check.csv")
     raw_probe = read_check_status(ROOT / "sophron_probe_jsonl_schema_check.csv")
@@ -167,6 +169,7 @@ def main() -> None:
         f"| SOPH-UNC-001-TARGET10 | Chunked 10% target sufficiency | {unc001_target10.upper()} | `Reasoning/sophron_probe_target10_check.csv` |",
         f"| SOPH-REG-DELTA | Baseline regression delta guard | {regression.upper()} | `Reasoning/sophron_regression_delta_check.csv` |",
         f"| SOPH-ELASTIC-STATE | Dynamic safety posture (NOMINAL/STABILIZING/FAIL-SAFE) | {elastic_state} | `Reasoning/sophron_probe_budget_bridge_check.csv` |",
+        f"| SOPH-ADV-POLICY | Adversarial policy resilience (deny/contain checks) | {adv_policy.upper()} | `Reasoning/sophron_adversarial_resilience_check.csv` |",
         f"| SOPH-UNC-002 | Cross-plane skew tolerance | {unc002.upper()} | `Reasoning/sophron_cross_plane_skew_summary.md` |",
         f"| SOPH-UNC-003 | Audit replay/truncation robustness | {unc003.upper()} | `Reasoning/sophron_audit_attack_results.csv` |",
         f"| SOPH-CORE-FRAME | Safety frame schema/runtime semantics | {core_frame.upper()} | `Reasoning/sophron_safety_frame_schema_check.csv` |",
@@ -175,7 +178,7 @@ def main() -> None:
         "## Overall",
     ]
 
-    statuses = [raw_probe, raw_skew, raw_audit, unc001, unc001_bridge, unc001_target10, regression, unc002, unc003, core_frame]
+    statuses = [raw_probe, raw_skew, raw_audit, unc001, unc001_bridge, unc001_target10, regression, adv_policy, unc002, unc003, core_frame]
     if all(s == "pass" for s in statuses):
         overall = "PASS"
     elif any(s == "fail" for s in statuses):

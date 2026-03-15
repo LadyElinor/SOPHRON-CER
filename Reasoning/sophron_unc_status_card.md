@@ -10,6 +10,7 @@
 | SOPH-UNC-001-TARGET10 | Chunked 10% target sufficiency | PASS | `Reasoning/sophron_probe_target10_check.csv` |
 | SOPH-REG-DELTA | Baseline regression delta guard | PASS | `Reasoning/sophron_regression_delta_check.csv` |
 | SOPH-ELASTIC-STATE | Dynamic safety posture (NOMINAL/STABILIZING/FAIL-SAFE) | NOMINAL | `Reasoning/sophron_probe_budget_bridge_check.csv` |
+| SOPH-ADV-POLICY | Adversarial policy resilience (deny/contain checks) | PASS | `Reasoning/sophron_adversarial_resilience_check.csv` |
 | SOPH-UNC-002 | Cross-plane skew tolerance | PASS | `Reasoning/sophron_cross_plane_skew_summary.md` |
 | SOPH-UNC-003 | Audit replay/truncation robustness | PASS | `Reasoning/sophron_audit_attack_results.csv` |
 | SOPH-CORE-FRAME | Safety frame schema/runtime semantics | PASS | `Reasoning/sophron_safety_frame_schema_check.csv` |

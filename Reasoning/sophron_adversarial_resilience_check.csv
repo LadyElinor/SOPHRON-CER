@@ -1,0 +1,5 @@
+test_id,expected_behavior,has_explicit_guard,pass
+SOPH-ADV-001,deny_and_log,True,True
+SOPH-ADV-002,deny_and_log,True,True
+SOPH-ADV-003,deny_and_log,True,True
+SOPH-ADV-004,contain_and_flag,True,True
