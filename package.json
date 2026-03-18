@@ -11,7 +11,16 @@
     "lint": "eslint .",
     "analyze": "node src/cli.js analyze",
     "validate": "node src/cli.js validate",
-    "report": "node src/cli.js report"
+    "report": "node src/cli.js report",
+    "quickstart": "node examples/minimal_pipeline/run_minimal_pipeline.js",
+    "cer:pipeline": "node examples/cer_pipeline/run_cer_pipeline.js",
+    "regime:pipeline": "node examples/regime_frontier_pipeline/run_regime_frontier_pipeline.js",
+    "physics:pipeline": "node examples/physics_pipeline/run_physics_pipeline.js",
+    "hodge:nl:pipeline": "node examples/hodge_nl_pipeline/run_hodge_nl_pipeline.js",
+    "strategy:rank": "node examples/strategy_prioritization/run_strategy_ranking.js",
+    "alignment:eval": "node examples/alignment_eval/run_alignment_eval.js",
+    "alignment:calibrate": "node examples/alignment_eval_calibration/run_alignment_calibration.js",
+    "alignment:policy-patch": "node examples/alignment_eval_calibration/run_generate_policy_patch.js"
   },
   "keywords": [
     "telemetry",

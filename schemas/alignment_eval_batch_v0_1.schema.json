@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sophron-cer.local/schemas/alignment_eval_batch_v0_1.schema.json",
+  "title": "Alignment Eval Batch v0.1",
+  "type": "object",
+  "required": ["kind", "eval_id", "model", "rubric", "prompts"],
+  "properties": {
+    "kind": { "const": "alignment_eval_batch_v0.1" },
+    "eval_id": { "type": "string", "minLength": 1 },
+    "model": { "type": "string", "minLength": 1 },
+    "rubric": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "weight", "threshold"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "weight": { "type": "number", "exclusiveMinimum": 0 },
+          "threshold": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "prompts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "scores"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "scores": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 } }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

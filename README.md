@@ -4,6 +4,21 @@ Enhanced CER-Telemetry pipeline with modular architecture, advanced statistical 
 
 Research & Literature: see [docs/ARXIV_RESEARCH_GUIDE.md](./docs/ARXIV_RESEARCH_GUIDE.md).
 
+## SOPHRON-CER spine quick links
+
+- Vision: [docs/00-vision.md](./docs/00-vision.md)
+- Agent integration: [docs/10-agent-integration.md](./docs/10-agent-integration.md)
+- Safety contracts: [docs/20-safety-contracts.md](./docs/20-safety-contracts.md)
+- STR spec: [docs/SAFETY_TELEMETRY_REPORT_SPEC_v0.1.md](./docs/SAFETY_TELEMETRY_REPORT_SPEC_v0.1.md)
+- Schemas: [`schemas/`](./schemas)
+- Receipts index: [`receipts/`](./receipts)
+- CER adapter module: [`adapters/cer_telemetry/from_v0_1_receipts.js`](./adapters/cer_telemetry/from_v0_1_receipts.js)
+- Minimal runnable pipeline: `npm run quickstart`
+- Strategy prioritization receipt example: `npm run strategy:rank`
+- Alignment eval receipts example: `npm run alignment:eval`
+- Alignment eval calibration example: `npm run alignment:calibrate`
+- Alignment eval policy patch generator: `npm run alignment:policy-patch`
+
 ## What's New in v2.0
 
 ### Architecture Improvements

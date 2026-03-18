@@ -1,0 +1,7 @@
+{
+  "kind": "alignment_eval_receipt_v0.1",
+  "overall_score": 0.82,
+  "overall_uncertainty": { "lower": 0.74, "upper": 0.88 },
+  "sample_size": 30,
+  "policy": { "accepted": true }
+}

@@ -1,0 +1,68 @@
+{
+  "criteria": [
+    { "id": "benefit", "label": "Expected benefit if successful", "weight": 0.30 },
+    { "id": "time_to_impact", "label": "Time-to-impact", "weight": 0.15 },
+    { "id": "robustness", "label": "Robustness under uncertainty", "weight": 0.20 },
+    { "id": "misuse_safety", "label": "Risk of misuse / capability externality", "weight": 0.20 },
+    { "id": "compounding", "label": "Compounding value", "weight": 0.15 }
+  ],
+  "alternatives": [
+    {
+      "id": "eval_receipts",
+      "name": "Alignment eval infrastructure with auditable receipts",
+      "scores": {
+        "benefit": 5,
+        "time_to_impact": 4,
+        "robustness": 5,
+        "misuse_safety": 5,
+        "compounding": 5
+      },
+      "rationale": "High leverage and low misuse; strengthens cross-team verification."
+    },
+    {
+      "id": "scalable_oversight",
+      "name": "Scalable oversight tooling",
+      "scores": {
+        "benefit": 5,
+        "time_to_impact": 4,
+        "robustness": 4,
+        "misuse_safety": 4,
+        "compounding": 5
+      }
+    },
+    {
+      "id": "mechinterp_bridge",
+      "name": "Mechanistic interpretability-behavior bridge",
+      "scores": {
+        "benefit": 5,
+        "time_to_impact": 2,
+        "robustness": 3,
+        "misuse_safety": 3,
+        "compounding": 5
+      }
+    },
+    {
+      "id": "policy_stress",
+      "name": "Policy training + adversarial stress testing",
+      "scores": {
+        "benefit": 4,
+        "time_to_impact": 4,
+        "robustness": 3,
+        "misuse_safety": 3,
+        "compounding": 4
+      }
+    },
+    {
+      "id": "capability_first",
+      "name": "Capability acceleration first",
+      "scores": {
+        "benefit": 2,
+        "time_to_impact": 4,
+        "robustness": 1,
+        "misuse_safety": 1,
+        "compounding": 2
+      },
+      "risks": ["High externality if safety/control lag"]
+    }
+  ]
+}

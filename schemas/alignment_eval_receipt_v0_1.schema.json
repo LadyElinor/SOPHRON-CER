@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sophron-cer.local/schemas/alignment_eval_receipt_v0_1.schema.json",
+  "title": "Alignment Eval Receipt v0.1",
+  "type": "object",
+  "required": [
+    "kind",
+    "generated_at",
+    "eval_id",
+    "model",
+    "sample_size",
+    "overall_score",
+    "overall_uncertainty",
+    "criterion_means",
+    "criterion_uncertainty",
+    "policy",
+    "source_hash"
+  ],
+  "properties": {
+    "kind": { "const": "alignment_eval_receipt_v0.1" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "eval_id": { "type": "string" },
+    "model": { "type": "string" },
+    "sample_size": { "type": "integer", "minimum": 1 },
+    "overall_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "overall_uncertainty": {
+      "type": "object",
+      "required": ["point", "lower", "upper", "confidence"],
+      "properties": {
+        "point": { "type": "number" },
+        "lower": { "type": "number" },
+        "upper": { "type": "number" },
+        "confidence": { "type": "number" }
+      }
+    },
+    "criterion_means": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 } },
+    "criterion_uncertainty": { "type": "object", "additionalProperties": { "type": "object" } },
+    "policy": {
+      "type": "object",
+      "required": ["criterion_thresholds_passed", "overall_gate", "overall_gate_passed", "sample_size_policy", "accepted", "decision"],
+      "properties": {
+        "criterion_thresholds_passed": { "type": "boolean" },
+        "overall_gate": { "type": "number" },
+        "overall_gate_passed": { "type": "boolean" },
+        "lower_bound_gate": { "type": ["number", "null"] },
+        "lower_bound_gate_passed": { "type": "boolean" },
+        "sample_size_policy": { "type": "object" },
+        "accepted": { "type": "boolean" },
+        "decision": { "type": "string" }
+      }
+    },
+    "failures": { "type": "array" },
+    "uncertainty_warnings": { "type": "array" },
+    "source_hash": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": true
+}
